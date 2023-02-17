@@ -15,17 +15,16 @@ const { logLevel = process.env.LOG_LEVEL || 'error' } = yargs(process.argv)
 
 function findScript(cmd) {
   const { name } = parse(cmd)
-  const scriptDirs = readdirSync(join('src', 'scripts')).filter((file) =>
-    statSync(join('src', 'scripts', file)).isDirectory()
-  )
+  const rootScriptDir = join('scripts')
+  const scriptDirs = readdirSync(rootScriptDir).filter((file) => statSync(join(rootScriptDir, file)).isDirectory())
   console.log(scriptDirs)
   for (const ext of ['ts', 'mjs', 'js', 'cjs']) {
-    const script = join('src', 'scripts', `${name}.${ext}`)
+    const script = join(rootScriptDir, `${name}.${ext}`)
     if (existsSync(script)) {
       return script
     } else {
       for (const dir of scriptDirs) {
-        const script = join('src', 'scripts', dir, `${name}.${ext}`)
+        const script = join(rootScriptDir, dir, `${name}.${ext}`)
         if (existsSync(script)) {
           return script
         }

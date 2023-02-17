@@ -204,8 +204,8 @@ export class SpotifyApi {
     }
   }
 
-  async playlist(playlist: string): Promise<Playlist | undefined> {
-    const playlistId = SpotifyApi.parseIdFromUri(playlist)
+  async playlist(playlistUri: string): Promise<Playlist | undefined> {
+    const playlistId = SpotifyApi.parseIdFromUri(playlistUri)
     const response = await this.request<Playlist>({ method: 'GET', route: `/playlists/${playlistId}` })
     if (response) {
       return new Playlist(response, this)
