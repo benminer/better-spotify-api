@@ -84,7 +84,6 @@ export class RequestEngine {
         response.on('data', (chunk) => (body += chunk))
         response.on('end', () => {
           const parsedBody = convertObjectToCamelCase(JSON.parse(body || '{}'))
-          console.log(parsedBody, 'parsedBody')
           const status = response.statusCode || 500
 
           if (status >= 200 && status < 300) {

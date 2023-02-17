@@ -1,12 +1,17 @@
-import https from 'https'
 import { exponentialBackoffWithJitter, sleep } from './util'
-import { RetrySettings } from './types'
 import { RequestEngine, Response } from './engine'
 import { SpotifyApiError, SpotifyTryAgainLater } from './errors'
+import { Playlist, User } from './models'
 
 export type Credentials = {
   clientId: string
   secret: string
+}
+
+export type RetrySettings = {
+  maxRetries: number
+  defaultRetryDelay: number
+  maxRetryDelay: number
 }
 
 export class SpotifyApi {
@@ -21,7 +26,11 @@ export class SpotifyApi {
 
   engine: RequestEngine
 
-  constructor(args: { credentials: Credentials | Promise<Credentials>; retry?: RetrySettings; timeout?: number }) {
+  constructor(args: {
+    credentials: Credentials | (() => Promise<Credentials>)
+    retry?: RetrySettings
+    timeout?: number
+  }) {
     if (typeof args.credentials === 'function') {
       this.credentialsGetter = args.credentials
     } else {
@@ -37,12 +46,25 @@ export class SpotifyApi {
     })
   }
 
+  static parseIdFromUri(uri: string) {
+    if (!uri) {
+      return undefined
+    }
+
+    if (uri.startsWith('https://open.spotify.com/')) {
+      const parts = uri.split('/')
+      return parts[parts.length - 1]
+    }
+
+    return uri
+  }
+
   static buildAuthToken(clientId: string, secret: string) {
     return Buffer.from(`${clientId}:${secret}`).toString('base64')
   }
 
   static async create(args: {
-    credentials: Credentials | Promise<Credentials>
+    credentials: Credentials | (() => Promise<Credentials>)
     retry?: RetrySettings
     timeout?: number
   }) {
@@ -179,6 +201,22 @@ export class SpotifyApi {
     } catch (err: any) {
       console.error(err, 'init error')
       throw err
+    }
+  }
+
+  async playlist(playlist: string): Promise<Playlist | undefined> {
+    const playlistId = SpotifyApi.parseIdFromUri(playlist)
+    const response = await this.request<Playlist>({ method: 'GET', route: `/playlists/${playlistId}` })
+    if (response) {
+      return new Playlist(response, this)
+    }
+  }
+
+  async user(userUri: string): Promise<User | undefined> {
+    const userId = SpotifyApi.parseIdFromUri(userUri)
+    const user = await this.request<User>({ method: 'GET', route: `/users/${userId}` })
+    if (user) {
+      return new User(user, this)
     }
   }
 }
