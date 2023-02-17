@@ -12,4 +12,4 @@ A class based library for easily interacting with the Spotify Web API.
 - 1:1 class models for all Spotify Entities: Playlist, Track, User, Audiobooks, Episodes, Shows, Albums, Artists
 - Smart Search, parse args cleanly. User should not have to think about doing any formatting.
 - For any paginated API requests, there should be both `.page` for AsyncGenerators and `list` that allows to get everything at once.
-- :heavy_check_mark: Auto retries with jitter, auto session refreshes
+- :white_check_mark: Auto retries with jitter, auto session refreshes
