@@ -13,3 +13,4 @@ A class based library for easily interacting with the Spotify Web API.
 - Smart Search, parse args cleanly. User should not have to think about doing any formatting.
 - For any paginated API requests, there should be both `.page` for AsyncGenerators and `list` that allows to get everything at once.
 - :white_check_mark: Auto retries with jitter, auto session refreshes
+- Full testability (with Jest): all entities should be class based unless it is a utility. This allows for better DX and easier testing.
